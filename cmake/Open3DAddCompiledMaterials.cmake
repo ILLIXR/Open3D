@@ -27,10 +27,6 @@ function(open3d_add_compiled_materials target)
         message(FATAL_ERROR "No material files specified for compilation.")
     endif()
 
-    if (NOT FILAMENT_MATC)
-        message(FATAL_ERROR "Filament material compiler FILAMENT_MATC not specified.")
-    endif()
-
     # Determine material compiler flags
     if (IOS OR ANDROID)
         set(FILAMENT_MATC_ARGS "--platform=mobile")
@@ -51,7 +47,8 @@ function(open3d_add_compiled_materials target)
 
         add_custom_command(
             OUTPUT ${COMPILED_MATERIAL_FULL_PATH}
-            COMMAND ${FILAMENT_MATC} ${FILAMENT_MATC_ARGS} -o ${COMPILED_MATERIAL_FULL_PATH} ${MATERIAL_FULL_PATH}
+            COMMAND filament::matc
+            ARGS ${FILAMENT_MATC_ARGS} -o ${COMPILED_MATERIAL_FULL_PATH} ${MATERIAL_FULL_PATH}
             COMMENT "Building Material object ${COMPILED_MATERIAL_RELATIVE_PATH}"
             MAIN_DEPENDENCY ${mat} DEPENDS Open3D::3rdparty_filament
             VERBATIM
