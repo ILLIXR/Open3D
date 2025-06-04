@@ -19,11 +19,11 @@
 
 #include <filament/Engine.h>
 #include <filament/IndexBuffer.h>
-#include <filament/MaterialEnums.h>
+#include <filament/filabridge/MaterialEnums.h>
 #include <filament/Scene.h>
 #include <filament/TransformManager.h>
 #include <filament/VertexBuffer.h>
-#include <geometry/SurfaceOrientation.h>
+#include <filament/geometry/SurfaceOrientation.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)

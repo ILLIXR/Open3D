@@ -19,7 +19,7 @@
 
 #include <filament/IndexBuffer.h>
 #include <filament/VertexBuffer.h>
-#include <geometry/SurfaceOrientation.h>
+#include <filament/geometry/SurfaceOrientation.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)

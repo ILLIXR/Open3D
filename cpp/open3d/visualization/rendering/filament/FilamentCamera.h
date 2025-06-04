@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <utils/Entity.h>
+#include <filament/utils/Entity.h>
 
 #include "open3d/visualization/rendering/Camera.h"
 

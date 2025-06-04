@@ -15,11 +15,11 @@
 
 #include <filament/Camera.h>
 #include <filament/Engine.h>
-#include <math/mat4.h>  // necessary for mat4f
+#include <filament/math/mat4.h>  // necessary for mat4f
 
 // Necessary for filament::utils::EntityManager::get(), replace with
 // engine_.getEntityManager() for Filament 1.9.23+
-#include <utils/EntityManager.h>
+#include <filament/utils/EntityManager.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -40,7 +40,8 @@ Camera::Transform FilamentToCameraTransform(const filament::math::mat4& ft) {
     return Camera::Transform(m);
 }
 
-Camera::Transform FilamentToCameraTransform(const filament::math::mat4f& ft) {
+[[maybe_unused]] Camera::Transform FilamentToCameraTransform(
+        const filament::math::mat4f& ft) {
     Camera::Transform::MatrixType m;
 
     m << ft(0, 0), ft(0, 1), ft(0, 2), ft(0, 3), ft(1, 0), ft(1, 1), ft(1, 2),
@@ -240,7 +241,8 @@ void FilamentCamera::LookAt(const Eigen::Vector3f& center,
 
 Eigen::Vector3f FilamentCamera::GetPosition() const {
     auto cam_pos = camera_->getPosition();
-    return {cam_pos.x, cam_pos.y, cam_pos.z};
+    return {static_cast<float>(cam_pos.x), static_cast<float>(cam_pos.y),
+            static_cast<float>(cam_pos.z)};
 }
 
 Eigen::Vector3f FilamentCamera::GetForwardVector() const {
@@ -314,7 +316,7 @@ void FilamentCamera::SetModelMatrix(const Eigen::Vector3f& forward,
                                     const Eigen::Vector3f& up) {
     using namespace filament;
 
-    math::mat4f ftransform = camera_->getModelMatrix();
+    auto ftransform = camera_->getModelMatrix();
     ftransform[0].xyz = math::float3(left.x(), left.y(), left.z());
     ftransform[1].xyz = math::float3(up.x(), up.y(), up.z());
     ftransform[2].xyz = math::float3(forward.x(), forward.y(), forward.z());

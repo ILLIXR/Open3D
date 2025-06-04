@@ -136,7 +136,7 @@ open3d_add_encoded_shader(shader
 add_source_group(shader/glsl)
 
 add_dependencies(visualization_impl shader)
-
+target_link_libraries(visualization_impl PUBLIC filament::utils filament::filament)
 
 open3d_show_and_abort_on_warning(visualization)
 open3d_set_global_properties(visualization)

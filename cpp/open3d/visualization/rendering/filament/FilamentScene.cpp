@@ -20,7 +20,7 @@
 #pragma warning(disable : 4068 4146 4293 4305)
 #endif  // _MSC_VER
 
-#include <backend/PixelBufferDescriptor.h>  // bogus 4146 warning on MSVC
+#include <filament/backend/PixelBufferDescriptor.h>  // bogus 4146 warning on MSVC
 #include <filament/Engine.h>
 #include <filament/IndirectLight.h>
 #include <filament/LightManager.h>
@@ -34,8 +34,8 @@
 #include <filament/TransformManager.h>
 #include <filament/VertexBuffer.h>
 #include <filament/View.h>
-#include <geometry/SurfaceOrientation.h>
-#include <utils/EntityManager.h>
+#include <filament/geometry/SurfaceOrientation.h>
+#include <filament/utils/EntityManager.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)

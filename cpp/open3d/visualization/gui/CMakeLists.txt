@@ -59,6 +59,7 @@ else()
         NativeLinux.cpp
     )
 endif()
+target_link_libraries(GUI PUBLIC filament::filament)
 
 open3d_show_and_abort_on_warning(GUI)
 open3d_set_global_properties(GUI)

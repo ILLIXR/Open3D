@@ -22,7 +22,7 @@
 
 #include <filament/LightManager.h>
 #include <filament/RenderableManager.h>
-#include <utils/Entity.h>
+#include <filament/utils/Entity.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)

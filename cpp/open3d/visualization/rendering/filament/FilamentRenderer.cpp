@@ -7,7 +7,7 @@
 
 #include "open3d/visualization/rendering/filament/FilamentRenderer.h"
 
-#include <utils/Entity.h>
+#include <filament/utils/Entity.h>
 
 // 4068: Filament has some clang-specific vectorizing pragma's that MSVC flags
 // 4146: Filament's utils/algorithm.h utils::details::ctz() tries to negate
@@ -22,7 +22,7 @@
 #pragma warning(disable : 4068 4146 4293 4305)
 #endif  // _MSC_VER
 
-#include <backend/PixelBufferDescriptor.h>
+#include <filament/backend/PixelBufferDescriptor.h>
 #include <filament/Engine.h>
 #include <filament/LightManager.h>
 #include <filament/RenderableManager.h>

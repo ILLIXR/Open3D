@@ -36,7 +36,7 @@
 #include <filament/Scene.h>
 #include <filament/TextureSampler.h>
 #include <filament/TransformManager.h>
-#include <utils/EntityManager.h>
+#include <filament/utils/EntityManager.h>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
