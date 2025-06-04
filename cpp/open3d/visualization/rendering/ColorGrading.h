@@ -25,8 +25,8 @@ public:
         kAcesLegacy = 1,
         kAces = 2,
         kFilmic = 3,
-        kUchimura = 4,
-        kReinhard = 5,
+        //kUchimura = 4,
+        //kReinhard = 5,
         kDisplayRange = 6,
     };
 

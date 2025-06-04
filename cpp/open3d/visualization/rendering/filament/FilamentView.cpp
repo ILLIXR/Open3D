@@ -27,6 +27,8 @@
 #include <filament/View.h>
 #include <filament/Viewport.h>
 
+#include <memory>
+
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif  // _MSC_VER
@@ -57,14 +59,14 @@ FilamentView::FilamentView(filament::Engine& engine,
                            FilamentResourceManager& resource_mgr)
     : engine_(engine), resource_mgr_(resource_mgr) {
     view_ = engine_.createView();
-    view_->setSampleCount(4);
+    view_->setMultiSampleAntiAliasingOptions({true, 4, false});
     SetAntiAliasing(true, false);
     SetPostProcessing(true);
     SetAmbientOcclusion(true, false);
     view_->setVisibleLayers(kAllLayersMask, kMainLayer);
     SetShadowing(true, ShadowType::kPCF);
     ColorGradingParams cp(ColorGradingParams::Quality::kHigh,
-                          ColorGradingParams::ToneMapping::kUchimura);
+                          ColorGradingParams::ToneMapping::kFilmic);
     SetColorGrading(cp);
 
     camera_ = std::make_unique<FilamentCamera>(engine_);
@@ -86,7 +88,7 @@ FilamentView::FilamentView(filament::Engine& engine,
 }
 
 FilamentView::~FilamentView() {
-    view_->setCamera(nullptr);
+    // view_->setCamera(nullptr);
     view_->setScene(nullptr);
 
     camera_.reset();
@@ -140,9 +142,14 @@ void FilamentView::SetWireframe(bool enable) {
     }
 }
 
-void FilamentView::SetSampleCount(int n) { view_->setSampleCount(n); }
+void FilamentView::SetSampleCount(int n) {
+    view_->setMultiSampleAntiAliasingOptions(
+            {true, static_cast<uint8_t>(n), false});
+}
 
-int FilamentView::GetSampleCount() const { return view_->getSampleCount(); }
+int FilamentView::GetSampleCount() const {
+    return view_->getMultiSampleAntiAliasingOptions().sampleCount;
+}
 
 void FilamentView::SetViewport(std::int32_t x,
                                std::int32_t y,
@@ -227,28 +234,29 @@ void FilamentView::SetColorGrading(const ColorGradingParams& color_grading) {
             break;
     }
 
-    filament::ColorGrading::ToneMapping tm =
-            filament::ColorGrading::ToneMapping::LINEAR;
+    std::shared_ptr<filament::ToneMapper> tm;
+    // filament::ColorGrading::ToneMapping::LINEAR;
     switch (color_grading.GetToneMapping()) {
+        case ColorGradingParams::ToneMapping::kLinear:
+            tm = std::make_shared<filament::LinearToneMapper>();
+            break;
         case ColorGradingParams::ToneMapping::kAcesLegacy:
-            tm = filament::ColorGrading::ToneMapping::ACES_LEGACY;
+            tm = std::make_shared<filament::ACESLegacyToneMapper>();
             break;
         case ColorGradingParams::ToneMapping::kAces:
-            tm = filament::ColorGrading::ToneMapping::ACES;
+            tm = std::make_shared<filament::ACESToneMapper>();
             break;
         case ColorGradingParams::ToneMapping::kFilmic:
-            tm = filament::ColorGrading::ToneMapping::FILMIC;
+            tm = std::make_shared<filament::FilmicToneMapper>();
             break;
-        case ColorGradingParams::ToneMapping::kUchimura:
-            tm = filament::ColorGrading::ToneMapping::UCHIMURA;
-            break;
-        case ColorGradingParams::ToneMapping::kReinhard:
-            tm = filament::ColorGrading::ToneMapping::REINHARD;
-            break;
+        // case ColorGradingParams::ToneMapping::kUchimura:
+        //     tm = filament::ColorGrading::ToneMapping::UCHIMURA;
+        //     break;
+        // case ColorGradingParams::ToneMapping::kReinhard:
+        //     tm = filament::ColorGrading::ToneMapping::REINHARD;
+        //     break;
         case ColorGradingParams::ToneMapping::kDisplayRange:
-            tm = filament::ColorGrading::ToneMapping::DISPLAY_RANGE;
-            break;
-        default:
+            tm = std::make_shared<filament::DisplayRangeToneMapper>();
             break;
     }
 
@@ -258,7 +266,7 @@ void FilamentView::SetColorGrading(const ColorGradingParams& color_grading) {
     color_grading_ =
             filament::ColorGrading::Builder()
                     .quality(q)
-                    .toneMapping(tm)
+                    .toneMapper(tm)
                     .whiteBalance(color_grading.GetTemperature(),
                                   color_grading.GetTint())
                     .channelMixer(
@@ -285,7 +293,7 @@ void FilamentView::SetColorGrading(const ColorGradingParams& color_grading) {
 }
 
 void FilamentView::ConfigureForColorPicking() {
-    view_->setSampleCount(1);
+    view_->setMultiSampleAntiAliasingOptions({true, 1, false});
     SetPostProcessing(false);
     SetAmbientOcclusion(false, false);
     SetShadowing(false, ShadowType::kPCF);
@@ -355,7 +363,9 @@ void FilamentView::CopySettingsFrom(const FilamentView& other) {
     if (other.color_grading_) {
         view_->setColorGrading(other.color_grading_);
     }
-    view_->setSampleCount(other.view_->getSampleCount());
+    view_->setMultiSampleAntiAliasingOptions(
+            {true, other.view_->getMultiSampleAntiAliasingOptions().sampleCount,
+             false});
     auto ao_options = other.view_->getAmbientOcclusionOptions();
     view_->setAmbientOcclusionOptions(ao_options);
     auto aa_mode = other.view_->getAntiAliasing();
@@ -386,8 +396,8 @@ void FilamentView::PreRender() {
             const auto n = camera_->GetNativeCamera()->getNear();
 
             FilamentMaterialModifier(selected_material, material_handle)
-                    .SetParameter("cameraNear", n)
-                    .SetParameter("cameraFar", f)
+                    .SetParameter("cameraNear", static_cast<float>(n))
+                    .SetParameter("cameraFar", static_cast<float>(f))
                     .Finish();
         }
     } else if (mode_ == Mode::Normals) {
